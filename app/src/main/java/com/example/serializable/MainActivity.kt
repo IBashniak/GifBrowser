@@ -2,12 +2,17 @@ package com.example.serializable
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.InternalSerializationApi
 
 class MainActivity : AppCompatActivity() {
-    private val restApi: RestApi = RestApi()
+    private val gifApi: GifApi = GifApi()
 
     @InternalSerializationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +22,20 @@ class MainActivity : AppCompatActivity() {
         btn.setOnClickListener {
             val textView = findViewById<TextView>(R.id.ResponseText)
             textView.text = "FFFFFFFFFFFFFF"
-            restApi.asyncGetRequest(this)
+            gifApi.asyncGetRequest(this)
+
+            GlobalScope.launch(Dispatchers.IO){
+                val result = GifRepositoryImpl(gifApi).getGifList()
+                withContext(Dispatchers.Main) {
+                    when (result) {
+                        is UseCaseResult.Success -> {
+                            result.data.forEach {
+                                Log.d("Main result.data", "${it.url} ")
+                            }
+                        }
+                    }
+                }
+            }
         }
 
     }

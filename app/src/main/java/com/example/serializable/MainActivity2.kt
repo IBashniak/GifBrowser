@@ -2,12 +2,10 @@ package com.example.serializable
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 
 
 class MainActivity2 : AppCompatActivity() {
-    private val restApi: RestApi = RestApi()
+    private val gifApi: GifApi = GifApi()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

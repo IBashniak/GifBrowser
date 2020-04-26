@@ -24,51 +24,24 @@ data class Meta(val status: Int, val msg: String, val response_id: String) {
 }
 
 @Serializable
-data class Data(var id: String = "", var url: String = "") {
+data class Gif(var id: String = "", var url: String = "") {
     companion object {
 //        @OptIn(UnstableDefault::class)
         private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
-        fun toObject(stringValue: String): Data {
-
-            val stringValue0 = "{\n" +
-                    "   \"type\":\"gif\",\n" +
-                    "   \"id\":\"YaZgr3Nj9DDI4\",\n" +
-                    "   \"url\":\"https:\\/\\/giphy.com\\/gifs\\/horse-YaZgr3Nj9DDI4\",\n" +
-                    "   \"slug\":\"horse-YaZgr3Nj9DDI4\",\n" +
-                    "   \"bitly_gif_url\":\"https:\\/\\/gph.is\\/1oliqdd\",\n" +
-                    "   \"bitly_url\":\"https:\\/\\/gph.is\\/1oliqdd\",\n" +
-                    "   \"embed_url\":\"https:\\/\\/giphy.com\\/embed\\/YaZgr3Nj9DDI4\",\n" +
-                    "   \"username\":\"\",\n" +
-                    "   \"source\":\"https:\\/\\/www.gifbay.com\\/gif\\/with_horse-124435\\/\",\n" +
-                    "   \"title\":\"horse GIF\",\n" +
-                    "   \"rating\":\"pg-13\",\n" +
-                    "   \"content_url\":\"\",\n" +
-                    "   \"source_tld\":\"www.gifbay.com\",\n" +
-                    "   \"source_post_url\":\"https:\\/\\/www.gifbay.com\\/gif\\/with_horse-124435\\/\",\n" +
-                    "   \"is_sticker\":0,\n" +
-                    "   \"import_datetime\":\"2014-04-01 11:50:45\",\n" +
-                    "   \"trending_datetime\":\"0000-00-00 00:00:00\",\n" +
-                    "   \"images\":{\n" +
-                    "\n" +
-                    "   }\n" +
-                    "}"
-//        val stringValue1 = "{\"protocol\":\"h2\", \"code\":200, \"message\":\"\", \"url\":\"https/://api.giphy.com/v1/gifs/search?api_key=7gapkk4T9HUCWF2R1XANh8VnnAPifZ2k&q=Horse\"}"
-            val stringValue1 = stringValue.replace("Response", "")
-            Log.d("toObject", stringValue1)
-
-
-            return json.parse(Data.serializer(), stringValue0)
+        fun toObject(stringValue: String): Gif {
+            Log.d("toObject", stringValue)
+            return json.parse(Gif.serializer(), stringValue)
         }
     }
 
     fun toJson(): String {
         val json = Json(JsonConfiguration.Stable)
-        return json.stringify(Data.serializer(), this)
+        return json.stringify(Gif.serializer(), this)
     }
 }
 
 @Serializable
-data class Body(var data: List<Data>, var meta: Meta) {
+data class Body(var data: List<Gif>, var meta: Meta) {
     companion object {
         private val json = Json(JsonConfiguration(ignoreUnknownKeys=true))
         fun toObject(stringValue: String): Body {

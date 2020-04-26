@@ -3,12 +3,19 @@ package com.example.serializable
 import android.app.Activity
 import android.util.Log
 import android.widget.TextView
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.serialization.InternalSerializationApi
 import okhttp3.*
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-class RestApi {
+class GifApi {
     companion object {
         private const val URL = "https://api.giphy.com/v1/"
         private const val API_KEY = "7gapkk4T9HUCWF2R1XANh8VnnAPifZ2k"
@@ -27,7 +34,74 @@ class RestApi {
                 .readTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .build()
     }
+    
+    /* Get route used to retrieve cat images, limit is the number of cats item */
 
+    fun getGifs(limit: Int)
+            : Deferred<List<Gif>>{
+        return     GlobalScope.async {
+
+            val urlBuilder =
+                HttpUrl.parse(URL + SEARCH_END_POINT)?.newBuilder()
+            urlBuilder?.addQueryParameter("api_key", API_KEY)
+            urlBuilder?.addQueryParameter("q", SEARCH_STRING)
+            urlBuilder?.addQueryParameter("limit", SEARCH_LIMITS.toString())
+
+            var url = urlBuilder?.build().toString()
+            val request: Request = Request.Builder()
+                .url(url)
+                .build()
+            Log.d("AsyncGetRequest url=", url)
+            var result: List<Gif> = listOf(Gif())
+
+            val call: Call = client.newCall(request)
+
+            suspendCoroutine<List<Gif>> {
+                val cont = it
+                call.enqueue(object : Callback {
+                    //            @Throws(IOException::class)
+                    override fun onResponse(call: Call?, response: Response?) {
+                        val resp = response?.body()?.string()
+                        Log.d("AsyncGetRequest '0' ", "body ${resp}  ")
+                        Log.d("AsyncGetRequest", "message ${response?.message().toString()}  ")
+                        Log.d(
+                            "AsyncGetRequest",
+                            "networkResponse ${response?.networkResponse().toString()}  "
+                        )
+                        Log.d(
+                            "AsyncGetRequest",
+                            "isSuccessful ${response?.isSuccessful.toString()}  "
+                        )
+                        Log.d("AsyncGetRequest", "call ${call.toString()}  ")
+
+                        val data = Gif.toObject(resp.toString())
+                        Log.d("AsyncGetRequest !!! data=", "call ${data.toString()}  ")
+                        if (resp != null) {
+                            val body = Body.toObject(resp)
+                            result = body.data
+
+                            Log.d(
+                                "body.data[0]",
+                                "${body.data[0].url} size = ${body.data.size} ${result.size}"
+                            )
+                            cont.resume(result)
+                        }
+                    }
+
+                    override fun onFailure(call: Call?, e: IOException?) {
+                        Log.d("AsyncGetRequest onFailure", call?.toString())
+                        Log.d("AsyncGetRequest e", e.toString())
+                        if (e != null) {
+                            cont.resumeWithException(e)
+                        }
+                    }
+                })
+                Log.d("body.data[0]", "result.size = ${result.size}")
+            }
+
+        }
+    }
+    
     @InternalSerializationApi
     fun asyncGetRequest(act: Activity) {
         val urlBuilder =
@@ -54,13 +128,10 @@ class RestApi {
 
                 Log.d("AsyncGetRequest", "call ${call.toString()}  ")
 
-                val data = Data.toObject(resp.toString())
+                val data = Gif.toObject(resp.toString())
                 Log.d("AsyncGetRequest !!! data=", "call ${data.toString()}  ")
                 if (resp != null) {
                     val body = Body.toObject(resp)
-                    body.data.forEach {
-                        Log.d("body.data", "${it.url} ")
-                    }
                     Log.d("body.data[0]", "${body.data[0].url} size = ${body.data.size}")
                 }
 
