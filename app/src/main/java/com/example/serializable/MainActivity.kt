@@ -27,15 +27,15 @@ class MainActivity : AppCompatActivity() {
             GlobalScope.launch(Dispatchers.IO){
                 val result = GifRepositoryImpl(gifApi).getGifList()
                 withContext(Dispatchers.Main) {
-                Log.d("Main result.data", "${result.toString()} ")
+                Log.d("Main result.data", "$result ")
                     when (result) {
                         is UseCaseResult.Success -> {
                             result.data.forEach {
-                                Log.d("Main result.data", "${it.url} ")
+                                Log.d("Main result.data", "${it.images.original} ")
                             }
                         }
                         is UseCaseResult.Error -> {
-                            Log.d("Main result.error", "${result.exception.toString()} ")
+                            Log.d("Main result.error", "${result.exception} ")
                         }
                     }
                 }

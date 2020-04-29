@@ -9,79 +9,68 @@ import kotlinx.serialization.json.JsonConfiguration
 @Serializable
 data class Meta(val status: Int, val msg: String, val response_id: String) {
     companion object {
-//        @OptIn(UnstableDefault::class)
+        //        @OptIn(UnstableDefault::class)
         private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
         fun toObject(stringValue: String): Meta {
-            return json.parse(Meta.serializer(), stringValue)
+            return json.parse(serializer(), stringValue)
         }
 
         fun toJson(field: Meta): String {
             // Обратите внимание, что мы вызываем Serializer, который автоматически сгенерирован из нашего класса
             // Сразу после того, как мы добавили аннотацию @Serializer
-            return json.stringify(Meta.serializer(), field)
+            return json.stringify(serializer(), field)
         }
     }
 }
 
 
 @Serializable
-data class Original(var url: String = "" ){
+data class Original(var url: String = "", val height: Int = 0, val width: Int = 0)
+//    companion object {
+//        //        @OptIn(UnstableDefault::class)
+//        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
+//        fun toObject(stringValue: String): Original {
+//            Log.d("Original toObject", stringValue)
+//            return json.parse(serializer(), stringValue)
+//        }
+//    }
+
+
+@Serializable
+data class Images(var original: Original)
+//    companion object {
+        //        @OptIn(UnstableDefault::class)
+//        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
+//        fun toObject(stringValue: String): Images {
+//            Log.d("Images toObject", stringValue)
+//            return json.parse(serializer(), stringValue)
+//        }
+//    }
+
+
+
+@Serializable
+data class Gif(var id: String = "", var images: Images = Images(Original())) {
     companion object {
         //        @OptIn(UnstableDefault::class)
-        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
-        fun toObject(stringValue: String): Original {
-            Log.d("toObject", stringValue)
-            return json.parse(Original.serializer(), stringValue)
-        }
-    }
-}
-
-@Serializable
-data class Images(var original: Original ){
-    companion object {
-        //        @OptIn(UnstableDefault::class)
-        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
-        fun toObject(stringValue: String): Images {
-            Log.d("toObject", stringValue)
-            return json.parse(Images.serializer(), stringValue)
-        }
-    }
-}
-
-
-@Serializable
-data class Gif(var id: String = "", var url: String = "" ) {
-    companion object {
-//        @OptIn(UnstableDefault::class)
         private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
         fun toObject(stringValue: String): Gif {
             Log.d("toObject", stringValue)
-            return json.parse(Gif.serializer(), stringValue)
+            return json.parse(serializer(), stringValue)
         }
-    }
-
-    fun toJson(): String {
-        val json = Json(JsonConfiguration.Stable)
-        return json.stringify(Gif.serializer(), this)
     }
 }
 
 @Serializable
 data class Body(var data: List<Gif>, var meta: Meta) {
     companion object {
-        private val json = Json(JsonConfiguration(ignoreUnknownKeys=true))
+        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
         fun toObject(stringValue: String): Body {
             Log.d(" Body toObject", stringValue)
-            return json.parse(Body.serializer(), stringValue)
+            return json.parse(serializer(), stringValue)
         }
     }
-
-    fun toJson(): String {
-        val json = Json(JsonConfiguration.Stable)
-        return json.stringify(Body.serializer(), this)
-    }
 }
-
 
 @Serializable
 data class Data2(val a: Int, val b: String = "42")
