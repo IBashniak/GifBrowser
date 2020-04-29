@@ -23,8 +23,34 @@ data class Meta(val status: Int, val msg: String, val response_id: String) {
     }
 }
 
+
 @Serializable
-data class Gif(var id: String = "", var url: String = "") {
+data class Original(var url: String = "" ){
+    companion object {
+        //        @OptIn(UnstableDefault::class)
+        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
+        fun toObject(stringValue: String): Original {
+            Log.d("toObject", stringValue)
+            return json.parse(Original.serializer(), stringValue)
+        }
+    }
+}
+
+@Serializable
+data class Images(var original: Original ){
+    companion object {
+        //        @OptIn(UnstableDefault::class)
+        private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))
+        fun toObject(stringValue: String): Images {
+            Log.d("toObject", stringValue)
+            return json.parse(Images.serializer(), stringValue)
+        }
+    }
+}
+
+
+@Serializable
+data class Gif(var id: String = "", var url: String = "" ) {
     companion object {
 //        @OptIn(UnstableDefault::class)
         private val json = Json(JsonConfiguration(ignoreUnknownKeys = true))

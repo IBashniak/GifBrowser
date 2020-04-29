@@ -3,15 +3,14 @@ package com.example.serializable
 import android.app.Activity
 import android.util.Log
 import android.widget.TextView
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.serialization.InternalSerializationApi
 import okhttp3.*
 import java.io.IOException
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
+import kotlin.coroutines.*
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
@@ -38,9 +37,9 @@ class GifApi {
     /* Get route used to retrieve cat images, limit is the number of cats item */
 
     fun getGifs(limit: Int)
-            : Deferred<List<Gif>>{
-        return     GlobalScope.async {
-
+            : Deferred<List<Gif>> {
+        return GlobalScope.async {
+            val TAG = "getGifs"
             val urlBuilder =
                 HttpUrl.parse(URL + SEARCH_END_POINT)?.newBuilder()
             urlBuilder?.addQueryParameter("api_key", API_KEY)
@@ -51,103 +50,34 @@ class GifApi {
             val request: Request = Request.Builder()
                 .url(url)
                 .build()
-            Log.d("AsyncGetRequest url=", url)
+            Log.d("$TAG url=", url)
             var result: List<Gif> = listOf(Gif())
 
-            val call: Call = client.newCall(request)
-
-            suspendCoroutine<List<Gif>> {
-                val cont = it
-                call.enqueue(object : Callback {
-                    //            @Throws(IOException::class)
-                    override fun onResponse(call: Call?, response: Response?) {
-                        val resp = response?.body()?.string()
-                        Log.d("AsyncGetRequest '0' ", "body ${resp}  ")
-                        Log.d("AsyncGetRequest", "message ${response?.message().toString()}  ")
-                        Log.d(
-                            "AsyncGetRequest",
-                            "networkResponse ${response?.networkResponse().toString()}  "
-                        )
-                        Log.d(
-                            "AsyncGetRequest",
-                            "isSuccessful ${response?.isSuccessful.toString()}  "
-                        )
-                        Log.d("AsyncGetRequest", "call ${call.toString()}  ")
-
-                        val data = Gif.toObject(resp.toString())
-                        Log.d("AsyncGetRequest !!! data=", "call ${data.toString()}  ")
-                        if (resp != null) {
-                            val body = Body.toObject(resp)
-                            result = body.data
-
-                            Log.d(
-                                "body.data[0]",
-                                "${body.data[0].url} size = ${body.data.size} ${result.size}"
-                            )
-                            cont.resume(result)
-                        }
-                    }
-
-                    override fun onFailure(call: Call?, e: IOException?) {
-                        Log.d("AsyncGetRequest onFailure", call?.toString())
-                        Log.d("AsyncGetRequest e", e.toString())
-                        if (e != null) {
-                            cont.resumeWithException(e)
-                        }
-                    }
-                })
-                Log.d("body.data[0]", "result.size = ${result.size}")
-            }
-
-        }
-    }
-    
-    @InternalSerializationApi
-    fun asyncGetRequest(act: Activity) {
-        val urlBuilder =
-            HttpUrl.parse(URL + SEARCH_END_POINT)?.newBuilder()
-        urlBuilder?.addQueryParameter("api_key", API_KEY)
-        urlBuilder?.addQueryParameter("q", SEARCH_STRING)
-        urlBuilder?.addQueryParameter("limit", SEARCH_LIMITS.toString())
-
-        var url = urlBuilder?.build().toString()
-        val request: Request = Request.Builder()
-            .url(url)
-            .build()
-        Log.d("AsyncGetRequest url=", url)
-
-        val call: Call = client.newCall(request)
-        call.enqueue(object : Callback {
-            //            @Throws(IOException::class)
-            override fun onResponse(call: Call?, response: Response?) {
+                val response = client.newCall(request).execute()
                 val resp = response?.body()?.string()
-                Log.d("AsyncGetRequest '0' ", "body ${resp}  ")
-                Log.d("AsyncGetRequest", "message ${response?.message().toString()}  ")
-                Log.d("AsyncGetRequest", "networkResponse ${response?.networkResponse().toString()}  ")
-                Log.d("AsyncGetRequest", "isSuccessful ${response?.isSuccessful.toString()}  ")
-
-                Log.d("AsyncGetRequest", "call ${call.toString()}  ")
+                Log.d("$TAG '0' ", "body ${resp}  ")
+                Log.d("$TAG", "message ${response?.message().toString()}  ")
+                Log.d(
+                    "$TAG",
+                    "networkResponse ${response?.networkResponse().toString()}  "
+                )
+                Log.d(
+                    "$TAG",
+                    "isSuccessful ${response?.isSuccessful.toString()}  "
+                )
 
                 val data = Gif.toObject(resp.toString())
-                Log.d("AsyncGetRequest !!! data=", "call ${data.toString()}  ")
+                Log.d("$TAG !!! data=", "call ${data.toString()}  ")
                 if (resp != null) {
                     val body = Body.toObject(resp)
-                    Log.d("body.data[0]", "${body.data[0].url} size = ${body.data.size}")
-                }
+                    result = body.data
 
-                act.runOnUiThread {
-                    val responseText = act.findViewById<TextView>(R.id.ResponseText)
-                    responseText.text = response?.toString()
-                    responseText.textSize = 26F
-                    Log.d("AsyncGetRequest ___", response?.toString())
+                    Log.d(
+                        "body.data[0]",
+                        "${body.data[0].url} size = ${body.data.size} ${result.size}"
+                    )
                 }
-            }
-
-            override fun onFailure(call: Call?, e: IOException?) {
-                Log.d("AsyncGetRequest onFailure", call?.toString())
-                Log.d("AsyncGetRequest e", e.toString())
-            }
-        })
+                return@async result
+        }
     }
-
 }

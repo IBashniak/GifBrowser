@@ -22,16 +22,20 @@ class MainActivity : AppCompatActivity() {
         btn.setOnClickListener {
             val textView = findViewById<TextView>(R.id.ResponseText)
             textView.text = "FFFFFFFFFFFFFF"
-            gifApi.asyncGetRequest(this)
+
 
             GlobalScope.launch(Dispatchers.IO){
                 val result = GifRepositoryImpl(gifApi).getGifList()
                 withContext(Dispatchers.Main) {
+                Log.d("Main result.data", "${result.toString()} ")
                     when (result) {
                         is UseCaseResult.Success -> {
                             result.data.forEach {
                                 Log.d("Main result.data", "${it.url} ")
                             }
+                        }
+                        is UseCaseResult.Error -> {
+                            Log.d("Main result.error", "${result.exception.toString()} ")
                         }
                     }
                 }
