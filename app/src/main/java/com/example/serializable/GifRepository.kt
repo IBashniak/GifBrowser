@@ -13,15 +13,28 @@ interface GifRepository {
 }
 
 class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
+
+    private val TAG= "GifRepositoryImpl"
+    companion object{
+        private var gifs: List<Gif> = listOf()
+    }
+
     override suspend fun getGifList(): UseCaseResult<List<Gif>> {
+        Log.d("GifRepositoryImpl", " result ${gifs.size}")
+        if (!gifs.isEmpty())
+         {
+             Log.d(TAG,"gifs.!isEmpty()")
+             return UseCaseResult.Success(gifs)
+         }
+
         /*
          We try to return a list of Gifs from the API
          Await the result from web service and then return it
          */
         return try {
-            val result = GifApi.getGifsAsync(15).await()
-            Log.d("GifRepositoryImpl"," result ${result.size}")
-            UseCaseResult.Success(result)
+            gifs = GifApi.getGifsAsync(15).await()
+            Log.d("GifRepositoryImpl", " result ${gifs.size}")
+            UseCaseResult.Success(gifs)
         } catch (ex: Exception) {
             UseCaseResult.Error(ex)
         }

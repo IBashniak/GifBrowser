@@ -16,7 +16,7 @@ class GifApi {
         private const val TIMEOUT_IN_SECONDS = 2
         private const val SEARCH_END_POINT = "gifs/search"
         private const val SEARCH_STRING = "Bojack Horse"
-        private const val SEARCH_LIMITS = 15
+        private const val SEARCH_LIMITS = 45
     }
 
     private lateinit var client: OkHttpClient
@@ -37,7 +37,7 @@ class GifApi {
     }
 
 
-    fun getGifsAsync(limit: Int)  : Deferred<List<Gif>> =
+    fun getGifsAsync(limit: Int) =
         GlobalScope.async {
             val TAG = "getGifs"
 
@@ -53,10 +53,7 @@ class GifApi {
             Log.d(TAG, "message ${response.message()}  ")
             Log.d(TAG, "networkResponse ${response.networkResponse().toString()}  "
             )
-            Log.d(
-                TAG,
-                "isSuccessful ${response.isSuccessful}  "
-            )
+            Log.d( TAG, "isSuccessful ${response.isSuccessful}  ")
 
             val data = Gif.toObject(resp.toString())
             Log.d("$TAG !!! data=", "call $data  ")
