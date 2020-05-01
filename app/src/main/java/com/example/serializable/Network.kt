@@ -1,10 +1,13 @@
 package com.example.serializable
 
 import android.util.Log
-import kotlinx.coroutines.Deferred
+import com.example.serializable.data.network.*
+import com.example.serializable.data.network.dto.Body
+import com.example.serializable.data.network.dto.Gif
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
@@ -23,16 +26,18 @@ class GifApi {
     private var url =""
 
     init {
-        client = OkHttpClient.Builder().connectTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        client =
+            OkHttpClient.Builder().connectTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .build()
         val urlBuilder =
-            HttpUrl.parse(URL + SEARCH_END_POINT)?.newBuilder()
-        urlBuilder?.addQueryParameter("api_key", API_KEY)
-        urlBuilder?.addQueryParameter("q", SEARCH_STRING)
-        urlBuilder?.addQueryParameter("limit", SEARCH_LIMITS.toString())
-
+            (URL + SEARCH_END_POINT).toHttpUrlOrNull()?.newBuilder()
+        urlBuilder?.apply {
+            addQueryParameter("api_key", API_KEY)
+            addQueryParameter("q", SEARCH_STRING)
+            addQueryParameter("limit", SEARCH_LIMITS.toString())
+        }
         url = urlBuilder?.build().toString()
     }
 
@@ -45,13 +50,15 @@ class GifApi {
                 .url(url)
                 .build()
             Log.d("$TAG url=", url)
-            var result: List<Gif> = listOf(Gif())
+            var result: List<Gif> = listOf(
+                Gif()
+            )
 
             val response = client.newCall(request).execute()
-            val resp = response.body()?.string()
+            val resp = response.body?.string()
             Log.d("$TAG '0' ", "body $resp  ")
-            Log.d(TAG, "message ${response.message()}  ")
-            Log.d(TAG, "networkResponse ${response.networkResponse().toString()}  "
+            Log.d(TAG, "message ${response.message}  ")
+            Log.d(TAG, "networkResponse ${response.networkResponse.toString()}  "
             )
             Log.d( TAG, "isSuccessful ${response.isSuccessful}  ")
 

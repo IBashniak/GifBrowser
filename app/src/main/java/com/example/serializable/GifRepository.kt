@@ -1,6 +1,7 @@
 package com.example.serializable
 
 import android.util.Log
+import com.example.serializable.data.network.dto.Gif
 
 sealed class UseCaseResult<out T : Any> {
     class Success<out T : Any>(val data: T) : UseCaseResult<T>()
