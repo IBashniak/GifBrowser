@@ -1,7 +1,7 @@
 package com.example.serializable
 
 import android.util.Log
-import com.example.serializable.data.network.dto.Gif
+import com.example.serializable.data.network.dto.GifDTO
 
 sealed class UseCaseResult<out T : Any> {
     class Success<out T : Any>(val data: T) : UseCaseResult<T>()
@@ -10,22 +10,22 @@ sealed class UseCaseResult<out T : Any> {
 
 interface GifRepository {
     // Suspend is used to await the result from Deferred
-    suspend fun getGifList(): UseCaseResult<List<Gif>>
+    suspend fun getGifList(): UseCaseResult<List<GifDTO>>
 }
 
 class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
 
     private val TAG= "GifRepositoryImpl"
     companion object{
-        private var gifs: List<Gif> = listOf()
+        private var gifDTOs: List<GifDTO> = listOf()
     }
 
-    override suspend fun getGifList(): UseCaseResult<List<Gif>> {
-        Log.d("GifRepositoryImpl", " result ${gifs.size}")
-        if (!gifs.isEmpty())
+    override suspend fun getGifList(): UseCaseResult<List<GifDTO>> {
+        Log.d("GifRepositoryImpl", " result ${gifDTOs.size}")
+        if (!gifDTOs.isEmpty())
          {
              Log.d(TAG,"gifs.!isEmpty()")
-             return UseCaseResult.Success(gifs)
+             return UseCaseResult.Success(gifDTOs)
          }
 
         /*
@@ -33,9 +33,9 @@ class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
          Await the result from web service and then return it
          */
         return try {
-            gifs = GifApi.getGifsAsync(15).await()
-            Log.d("GifRepositoryImpl", " result ${gifs.size}")
-            UseCaseResult.Success(gifs)
+            gifDTOs = GifApi.getGifsAsync(15).await()
+            Log.d("GifRepositoryImpl", " result ${gifDTOs.size}")
+            UseCaseResult.Success(gifDTOs)
         } catch (ex: Exception) {
             UseCaseResult.Error(ex)
         }

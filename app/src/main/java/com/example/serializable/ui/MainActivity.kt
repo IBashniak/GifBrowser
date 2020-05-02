@@ -12,12 +12,9 @@ import com.example.serializable.GifApi
 import com.example.serializable.GifRepositoryImpl
 import com.example.serializable.R
 import com.example.serializable.UseCaseResult
-import com.example.serializable.data.network.dto.Gif
-import kotlinx.android.synthetic.main.list_item.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.InternalSerializationApi
 
 class MainActivity : AppCompatActivity() {
@@ -49,10 +46,10 @@ class MainActivity : AppCompatActivity() {
                 is UseCaseResult.Success -> {
                     val img = gifs.data.random()
                     Glide.with(activity)
-                        .load(img.images.original.url)
+                        .load(img.imagesDTO.originalDTO.url)
                         .into(image);
                     gifs.data.forEach {
-                        Log.d("Main result.data", "${it.images.original} ")
+                        Log.d("Main result.data", "${it.imagesDTO.originalDTO} ")
                     }
                 }
                 is UseCaseResult.Error -> {

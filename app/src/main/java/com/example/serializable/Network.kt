@@ -1,12 +1,10 @@
 package com.example.serializable
 
 import android.util.Log
-import com.example.serializable.data.network.*
-import com.example.serializable.data.network.dto.Body
-import com.example.serializable.data.network.dto.Gif
+import com.example.serializable.data.network.dto.BodyDTO
+import com.example.serializable.data.network.dto.GifDTO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,7 +20,7 @@ class GifApi {
         private const val SEARCH_LIMITS = 45
     }
 
-    private lateinit var client: OkHttpClient
+    private var client: OkHttpClient
     private var url =""
 
     init {
@@ -50,8 +48,8 @@ class GifApi {
                 .url(url)
                 .build()
             Log.d("$TAG url=", url)
-            var result: List<Gif> = listOf(
-                Gif()
+            var result: List<GifDTO> = listOf(
+                GifDTO()
             )
 
             val response = client.newCall(request).execute()
@@ -62,15 +60,15 @@ class GifApi {
             )
             Log.d( TAG, "isSuccessful ${response.isSuccessful}  ")
 
-            val data = Gif.toObject(resp.toString())
+            val data = GifDTO.toObject(resp.toString())
             Log.d("$TAG !!! data=", "call $data  ")
             if (resp != null) {
-                val body = Body.toObject(resp)
+                val body = BodyDTO.toObject(resp)
                 result = body.data
 
                 Log.d(
                     "body.data[0]",
-                    "${body.data[0].images.original.url} size = ${body.data.size} ${result.size}"
+                    "${body.data[0].imagesDTO.originalDTO.url} size = ${body.data.size} ${result.size}"
                 )
             }
             return@async result
