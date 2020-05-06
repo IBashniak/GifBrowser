@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonConfiguration
 
 @Serializable
 data class GifDTO(var id: String = "", @SerialName("images") var imagesDTO: ImagesDTO = ImagesDTO(OriginalDTO())) {
-    val url = imagesDTO.originalDTO.url
 
     companion object {
         //        @OptIn(UnstableDefault::class)

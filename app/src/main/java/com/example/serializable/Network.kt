@@ -5,6 +5,7 @@ import com.example.serializable.data.network.dto.BodyDTO
 import com.example.serializable.data.network.dto.GifDTO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -21,7 +22,8 @@ class GifApi {
     }
 
     private var client: OkHttpClient
-    private var url =""
+
+
 
     init {
         client =
@@ -29,21 +31,21 @@ class GifApi {
                 .writeTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .build()
-        val urlBuilder =
-            (URL + SEARCH_END_POINT).toHttpUrlOrNull()?.newBuilder()
-        urlBuilder?.apply {
-            addQueryParameter("api_key", API_KEY)
-            addQueryParameter("q", SEARCH_STRING)
-            addQueryParameter("limit", SEARCH_LIMITS.toString())
-        }
-        url = urlBuilder?.build().toString()
     }
 
 
-    fun getGifsAsync(limit: Int) =
+    fun getGifsAsync(search: String = SEARCH_STRING, limit: Int = SEARCH_LIMITS) =
         GlobalScope.async {
-            val TAG = "getGifs"
-
+            val TAG = "getGifsAsync"
+            val urlBuilder =
+                (URL + SEARCH_END_POINT).toHttpUrlOrNull()?.newBuilder()
+            urlBuilder?.apply {
+                addQueryParameter("api_key", API_KEY)
+                addQueryParameter("q", search)
+                addQueryParameter("limit", limit.toString())
+            }
+            val url = urlBuilder?.build().toString()
+            Log.d(TAG, url)
             val request: Request = Request.Builder()
                 .url(url)
                 .build()

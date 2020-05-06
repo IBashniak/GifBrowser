@@ -10,7 +10,7 @@ sealed class UseCaseResult<out T : Any> {
 
 interface GifRepository {
     // Suspend is used to await the result from Deferred
-    suspend fun getGifList(): UseCaseResult<List<GifDTO>>
+    suspend fun getGifList(search : String): UseCaseResult<List<GifDTO>>
 }
 
 class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
@@ -18,13 +18,15 @@ class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
     private val TAG= "GifRepositoryImpl"
     companion object{
         private var gifDTOs: List<GifDTO> = listOf()
+        private var lastRequest=""
     }
 
-    override suspend fun getGifList(): UseCaseResult<List<GifDTO>> {
-        Log.d("GifRepositoryImpl", " result ${gifDTOs.size}")
-        if (!gifDTOs.isEmpty())
+    override suspend fun getGifList(search : String): UseCaseResult<List<GifDTO>> {
+        Log.d("GifRepositoryImpl", " result ${gifDTOs.size}  lastRequest= $lastRequest,  search= $search ")
+        if (gifDTOs.isNotEmpty() && lastRequest == search)
          {
-             Log.d(TAG,"gifs.!isEmpty()")
+             Log.d(TAG,"gifs.isNotEmpty()")
+             lastRequest = search
              return UseCaseResult.Success(gifDTOs)
          }
 
@@ -33,7 +35,7 @@ class GifRepositoryImpl(private val GifApi: GifApi) : GifRepository {
          Await the result from web service and then return it
          */
         return try {
-            gifDTOs = GifApi.getGifsAsync(15).await()
+            gifDTOs = GifApi.getGifsAsync(search,55).await()
             Log.d("GifRepositoryImpl", " result ${gifDTOs.size}")
             UseCaseResult.Success(gifDTOs)
         } catch (ex: Exception) {
