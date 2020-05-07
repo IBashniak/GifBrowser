@@ -19,3 +19,6 @@ data class GifDTO(var id: String = "", @SerialName("images") var imagesDTO: Imag
         }
     }
 }
+
+val GifDTO.url
+    get() = imagesDTO.originalDTO.url

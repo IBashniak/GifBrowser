@@ -17,6 +17,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.serializable.R
 import com.example.serializable.data.network.dto.GifDTO
+import com.example.serializable.data.network.dto.url
 
 class GifViewHolder private constructor( @NonNull itemView: View,    private val imageLoader: RequestManager) : ViewHolder(itemView) {
     private var ivGif: ImageView? = null
@@ -27,13 +28,13 @@ class GifViewHolder private constructor( @NonNull itemView: View,    private val
     }
 
     fun bindItem(@NonNull gif: GifDTO) {
-        Log.d(TAG, "bindItem  ${gif.imagesDTO.originalDTO.url}")
+        Log.d(TAG, "bindItem  ${gif.url}")
         progressBar!!.visibility = View.VISIBLE
         if (ivGif ==null)
             Log.d(TAG, "ivGif ==nul !!!  ${ivGif.toString()}")
         ivGif?.let {
              Glide.with(ivGif!!)
-                .load(gif.imagesDTO.originalDTO.url)
+                 .load(gif.url)
                 .listener (object : RequestListener<Drawable> { //9
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?,
                                               isFirstResource: Boolean): Boolean {
