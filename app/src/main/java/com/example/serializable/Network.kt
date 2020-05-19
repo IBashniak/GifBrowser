@@ -5,11 +5,12 @@ import com.example.serializable.data.network.dto.BodyDTO
 import com.example.serializable.data.network.dto.GifDTO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
+
 
 class GifApi {
     companion object {
@@ -26,10 +27,15 @@ class GifApi {
 
 
     init {
-        client =
-            OkHttpClient.Builder().connectTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
+
+        client = OkHttpClient.Builder().connectTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)  //  okhttp3.OkHttpClient
+            .addInterceptor(RequestInterceptor())
                 .build()
     }
 
